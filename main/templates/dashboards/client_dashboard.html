@@ -1,0 +1,40 @@
+{% comment %} {% extends "base.html" %}
+{% block content %}
+  <h2>Welcome, {{ user.username }}!</h2>
+  <h3>Your Bookings:</h3>
+  <ul>
+    {% for booking in bookings %}
+      <li>{{ booking.date }} at {{ booking.time }} with {{ booking.counsellor }}</li>
+    {% empty %}
+      <li>No bookings yet.</li>
+    {% endfor %}
+  </ul>
+
+  <h3>Recommended Articles:</h3>
+  <ul>
+    {% for article in articles %}
+      <li>{{ article.title }}</li>
+    {% empty %}
+      <li>No articles available.</li>
+    {% endfor %}
+  </ul>
+{% endblock %} {% endcomment %}
+
+
+
+
+
+
+{% comment %} 
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>client dashbord</title>
+  <link rel="stylesheet" href="{% static 'style.css' %}"> 
+</head>
+<body>
+  <div class="navbar">
+   <img >
+  </div> {% endcomment %}
