@@ -1,0 +1,52 @@
+
+{% load static %}
+{% block content %}
+
+
+    <link rel="stylesheet" href="{% static 'counsellor_dashboard.css' %}">
+  <body style="background-color: lightblue;">
+  <h2 style="color:#0e7390;">Welcome, {{ user.username }}!</h2>
+  <h3>Your Bookings:</h3>
+
+  <table border="1">
+    <tr>
+      <th>Client</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+    {% for b in bookings %}
+    <tr>
+      <!-- show just client username -->
+      <td>{{ b.client.user.username }}</td>  
+
+      <td>
+        {% comment %} {% if b.status == "pending" %}
+          <span style="color: orange;">Pending</span>
+        {% elif b.status == "approved" %}
+          ✅ Scheduled for {{ b.approved_date }} at {{ b.approved_time }}
+        {% endif %} {% endcomment %}
+            
+        {% if b.get_status_display == "Pending" %}
+          <span style="color: orange;">Pending</span>
+        {% elif b.get_status_display == "Approved" %}
+          ✅ Scheduled for {{ b.approved_date }} at {{ b.approved_time }}
+        {% endif %}
+
+
+      </td>
+
+      <td>
+        {% if b.status == "Pending" %}
+          <a href="{% url 'approve_booking' b.id %}">Approve</a>
+        {% else %}
+          Approved
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="3">No bookings yet.</td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

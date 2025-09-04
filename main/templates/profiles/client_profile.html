@@ -1,0 +1,34 @@
+ {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>profile</title>
+  <link rel="stylesheet" href="{% static 'profile_style.css' %}">
+</head>
+<body>
+    <div class="profile-container">
+    <h2>Client Profile</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="update-btn">Update Profile</button>
+</form>
+</html></body> 
+{% comment %} <div class="profile-container">
+    <h2>Edit Profile</h2>
+    <button class="cancel-btn">CANCEL</button>
+
+    <img src="profile.png" alt="Profile" class="profile-picture">
+    <a href="#" class="change-link">Change Profile picture</a>
+
+    <form>
+        <input type="text" placeholder="Firstname" value="devika">
+        <input type="text" placeholder="Lastname" value="a">
+        <input type="email" placeholder="Email" value="devika@gmail.com">
+        <input type="text" placeholder="interest" value="student">
+
+        <button type="submit" class="update-btn">UPDATE PROFILE</button>
+    </form>
+</div> {% endcomment %}

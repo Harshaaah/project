@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recommended Articles</title>
+  <link rel="stylesheet" href="{% static 'article_style.css' %}">
+</head>
+<body><h2>Recommended Articles</h2>
+
+{% if articles %}
+  <ul>
+    {% for article in articles %}
+    <div class="articles">
+      <li>
+        <h3>{{ article.title }}</h3>
+        <p><b>Category:</b> {{ article.category }}</p>
+        <p>{{ article.description|linebreaksbr }}</p>
+      </li>
+    </div>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No recommendations found. Add some interests!</p>
+{% endif %}
+</body>
+</html>

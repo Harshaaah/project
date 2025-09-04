@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Client Dashboard</title>
+  <link rel="stylesheet" href="{% static 'client_dashboard.css' %}">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">Care your Mind</div>
+    <ul class="navbar-links">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      <li><a href="{% url 'client_profile' %}">Profile</a></li>
+      <li><a href="{% url 'logout' %}">Logout</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <h1>Welcome, {{ user.username }}</h1>
+
+    <section class="profile-section">
+      <h2>👤 Your Profile</h2>
+      <div class="profile-box">
+        <p><strong>Age:</strong> {{ user.client.age }}</p>
+        <p><strong>Interest:</strong> {{ client.interest }}</p>
+
+        <h3> Add New Interest</h3>
+        <form method="POST">
+          {% csrf_token %}
+          
+          <label for="new_interest">Select Interest:</label>
+          <select name="new_interest" id="new_interest" required>
+            <option value="stress">select</option>
+            <option value="stress">Stress</option>
+            <option value="career">Career</option>
+            <option value="relationship">Relationship</option>
+            <option value="health">Health</option>
+            <option value="finance">Finance</option>
+          </select>
+          <div>
+          <button class="btn" type="submit">Add Interest</button>
+        </form>
+
+        {% if interest_message %}
+        <p style="color: green;">{{ interest_message }}</p>
+        {% endif %}
+        {% if interest_error %}
+          <p style="color: red;">{{ interest_error }}</p>
+        {% endif %}
+      </div>
+    </section>
+    
+
+
+
+    <section class="articles-section">
+      <h2> AI Recommended Articles</h2>
+      <section class="profile-box">
+        <p>Based on your interests: {{ interests }}</p>
+
+      <div class="dashboard-links">
+        <a href="{% url 'recommend_articles' %}">
+          <button class="btn">View Recommended Articles</button>
+        </a>
+      </div>
+
+    </section class="articles-section">
+    <h2>📅 Your Bookings</h2>
+    <section class="profile-box">
+      
+      {% comment %} <ul>
+        {% for booking in bookings %}
+          <li>{{ booking.counsellor.username }} on {{ booking.date }}</li>
+          <strong style="color: 
+          {% if booking.status == 'Accepted' %}green
+          {% elif booking.status == 'Rejected' %}red
+          {% else %}orange
+          {% endif %}
+          ">( {{ booking.status }} )</strong>
+          </li>
+  
+        {% empty %}
+          <li>No bookings yet</li>
+        {% endfor %}
+      </ul>
+      <a class="btn" href="{% url 'book_counsellor' %}">Book Counsellor</a> {% endcomment %}
+      {% if bookings %}
+        <ul>
+          {% for booking in bookings %}
+          <li>
+            Counsellor: {{ booking.counsellor.user.username }} <br>
+
+            {% if booking.status == "Approved" %}
+              On {{ booking.approved_date }} at {{ booking.approved_time }}
+              ( <span style="color:green;">Approved</span> )
+            {% else %}
+              ( <span style="color:orange;">Pending</span> )
+            {% endif %}
+        </li>
+        <hr>
+        {% endfor %}
+    </ul>
+  {% else %}
+    <p>No bookings yet.</p>
+  {% endif %}
+
+  <a href="{% url 'book_counsellor' %}">
+    <button class="btn">Book Counsellor</button>
+  </a>
+    </section>
+
+    <h2>👨‍⚕️ Available Counsellors</h2>
+    <section class="profile-box">
+      
+      <ul>
+        {% for counsellor in counsellors %}
+          <li>{{ counsellor.user.username }} – {{ counsellor.experience }} years</li>
+        {% empty %}
+          <li>No counsellors available</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+  </div>
+</body>
+</html>

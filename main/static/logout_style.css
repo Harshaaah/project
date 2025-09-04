@@ -1,0 +1,28 @@
+body {
+      font-family: 'Poppins', sans-serif;
+      background-color:lightblue;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+      margin: 0;
+}
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #009688;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+button:hover {
+    background-color: #00796b;
+  }
+h2{
+    color:#00796b;
+}

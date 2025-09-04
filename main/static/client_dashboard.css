@@ -1,0 +1,178 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: lightblue;
+  color: #333;
+  align-items:center;
+
+}
+/* body {
+  font-family: 'Poppins', sans-serif;
+  background-color:lightblue;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+  margin: 0;
+} */
+.navbar {
+  background: #2c3e50;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.navbar-links li a {
+  color: #ecf0f1;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.container {
+  padding: 2rem;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+section {
+  margin-bottom: 2rem;
+}
+
+.profile-section h2 {
+  color: #0e7390;
+
+
+}
+
+.profile-box {
+  background: white;
+  padding: 1rem;
+  border-left: 5px solid #0e7390;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-top: 0.5rem;
+  border-radius: 5px;
+}
+
+.articles-section h2,
+.bookings-section h2,
+.counsellor-section h2 {
+  color: #0e7390;
+}
+
+ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+}
+
+/* .btn {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #ae2727;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+} */
+
+.btn:hover {
+  background: #01534a;
+}
+.btn {
+    background-color: #009688;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.btn-articles:hover {
+    background-color:  #00796b;
+}
+/* body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f6f9;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3 {
+  margin: 0 0 10px 0;
+}
+.container {
+  width: 80%;
+  margin: 20px auto;
+} */
+
+
+        /* .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .profile {
+            border-left: 5px solid #4a90e2;
+        }
+
+        .articles {
+            border-left: 5px solid #9b59b6;
+            background: #fdf4ff;
+        }
+
+        .bookings {
+            border-left: 5px solid #2ecc71;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #333;
+            padding: 5px 10px;
+            margin: 5px 5px 0 0;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #4caf50;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        select {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        } */
