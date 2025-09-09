@@ -6,7 +6,7 @@
   <title>Recommended Articles</title>
   <link rel="stylesheet" href="{% static 'article_style.css' %}">
 </head>
-<body><h2>Recommended Articles</h2>
+{% comment %} <body><h2>Recommended Articles</h2>
 
 {% if articles %}
   <ul>
@@ -22,6 +22,21 @@
   </ul>
 {% else %}
   <p>No recommendations found. Add some interests!</p>
-{% endif %}
+{% endif %} {% endcomment %}
+<h2>Recommended Articles</h2>
+<p>Based on your interests: {{ interests|join:", " }}</p>
+
+<ul>
+  {% for article in articles %}
+    <li>
+      <h3>{{ article.title }}</h3>
+      <p><b>Category:</b> {{ article.category }}</p>
+      <p>{{ article.description }}</p>
+    </li>
+  {% empty %}
+    <li>No articles found matching your interests.</li>
+  {% endfor %}
+</ul>
+
 </body>
 </html>

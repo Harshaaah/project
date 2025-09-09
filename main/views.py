@@ -334,61 +334,52 @@ def logout_view(request):
     logout(request)
     return render(request, 'logout.html')  # Redirect to a logout confirmation page or home page
 
+# 
+import os
 import pandas as pd
+from django.conf import settings
 from django.shortcuts import render
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from .models import Client
-@login_required
+
 def recommend_articles(request):
-    # 1️⃣ Load the dataset (CSV file with articles)
-    # Make sure you have a file called "articles.csv" in your project
-    # Example file columns: title, category, description
-    df = pd.read_csv("articles.csv")
-
-    # 2️⃣ Get the logged-in client
+    # Step 1: Get the client's interests
     client = Client.objects.get(user=request.user)
-
-    # 3️⃣ Get the client's interests (example: "stress, relationship")
-    # If interests exist → split into a list
-    # Example: "stress, relationship" → ["stress", "relationship"]
     interests = client.interest.split(",") if client.interest else []
+    
+    # Step 2: Load the dataset
+    file_path = os.path.join(settings.BASE_DIR, "articles.csv")
+    df = pd.read_csv(file_path)
 
-    # 4️⃣ Filter articles where the category matches client interests
-    # df['category'].isin(...) checks if category is in the list of interests
-    recommended = df[df['category'].isin([i.strip() for i in interests])]
+    # Step 3: Combine title and description for better analysis
+    df['content'] = df['title'] + " " + df['description']
 
-    # 5️⃣ Convert the filtered articles into a Python dictionary
-    # So we can use them easily in the template
-    articles = recommended.to_dict(orient="records")
+    # Step 4: Use TF-IDF to vectorize the content
+    vectorizer = TfidfVectorizer(stop_words='english')
+    tfidf_matrix = vectorizer.fit_transform(df['content'])
 
-    # 6️⃣ Send the articles to the template (articles.html)
-    return render(request, "recommend_articles.html", {"articles": articles})
+    # Step 5: Convert interests into one string
+    interest_text = " ".join(interests)
+
+    # Step 6: Vectorize the interest
+    interest_vec = vectorizer.transform([interest_text])
+
+    # Step 7: Compute similarity scores
+    similarities = cosine_similarity(interest_vec, tfidf_matrix).flatten()
+
+    # Step 8: Add the similarity score to the dataframe
+    df['score'] = similarities
+
+    # Step 9: Sort articles by similarity score
+    recommended = df.sort_values(by='score', ascending=False)
+
+    # Step 10: Convert to list of dicts for template
+    articles = recommended.to_dict(orient='records')
+
+    return render(request, "recommend_articles.html", {"articles": articles, "interests": interests})
 
 
-# def add_interest(request):
-    if request.method == "POST":
-        selected_interest = request.POST.get("new_interest")
-        if selected_interest:
-            request.user.client.interest = selected_interest
-            request.user.client.save()
-    return render(request, "counsellor_dashboard.html")
-
-# @login_required
-# def profile_view(request):
-#     user_form = UserForm(instance=request.user)
-#     client_form = ClientForm(instance=request.user.client)
-
-#     if request.method == 'POST':
-#         user_form = UserForm(request.POST, instance=request.user)
-#         client_form = ClientForm(request.POST, instance=request.user.client)
-#         if user_form.is_valid() and client_form.is_valid():
-#             user_form.save()
-#             client_form.save()
-#             return redirect('profile')  # reload profile page
-
-#     return render(request, 'profile.html', {
-#         'user_form': user_form,
-#         'client_form': client_form
-#     })
 from .forms import ClientProfileForm, CounsellorProfileForm
 @login_required
 def client_profile(request):
