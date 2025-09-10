@@ -44,7 +44,7 @@
       </td>
 
       <td>
-        {% if b.status == "Pending" %}
+        {% if b.status == "pending" %}
           <a href="{% url 'approve_booking' b.id %}">Approve</a>
         {% else %}
           Approved

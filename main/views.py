@@ -335,49 +335,169 @@ def logout_view(request):
     return render(request, 'logout.html')  # Redirect to a logout confirmation page or home page
 
 # 
+# import os
+# import pandas as pd
+# from django.conf import settings
+# from django.shortcuts import render
+# from .models import Client
+
+# def recommend_articles(request):
+#     # Build full path for dataset
+#     file_path = os.path.join(settings.BASE_DIR, "articles.csv")
+
+#     # Load dataset
+#     df = pd.read_csv(file_path)
+
+#     # Get client interests
+#     client = Client.objects.get(user=request.user)
+#     interests = client.interest.split(",") if client.interest else []
+
+#     # Filter dataset: keep only articles matching interests
+#     recommended = df[df['category'].isin([i.strip() for i in interests])]
+
+#     # Convert filtered articles to dictionary for template
+#     articles = recommended.to_dict(orient="records")
+
+#     # Render the template with the articles data
+#     return render(request, "recommend_articles.html", {"articles": articles})
+
+
+# import os
+# import pandas as pd
+# from django.conf import settings
+# from django.shortcuts import render
+# from sklearn.feature_extraction.text import TfidfVectorizer
+# from sklearn.metrics.pairwise import cosine_similarity
+# from .models import Client
+
+# def recommend_articles(request):
+#     # Step 1: Get the client's interests
+#     client = Client.objects.get(user=request.user)
+#     interests = client.interest.split(",") if client.interest else []
+    
+#     # Step 2: Load the dataset
+#     file_path = os.path.join(settings.BASE_DIR, "articles.csv")
+#     df = pd.read_csv(file_path)
+
+#     # Step 3: Combine title and description for better analysis
+#     df['content'] = df['title'] + " " + df['description']
+
+#     # Step 4: Use TF-IDF to vectorize the content
+#     vectorizer = TfidfVectorizer(stop_words='english')
+#     tfidf_matrix = vectorizer.fit_transform(df['content'])
+
+#     # Step 5: Convert interests into one string
+#     interest_text = " ".join(interests)
+
+#     # Step 6: Vectorize the interest
+#     interest_vec = vectorizer.transform([interest_text])
+
+#     # Step 7: Compute similarity scores
+#     similarities = cosine_similarity(interest_vec, tfidf_matrix).flatten()
+
+#     # Step 8: Add the similarity score to the dataframe
+#     df['score'] = similarities
+
+#     # Step 9: Sort articles by similarity score
+#     recommended = df.sort_values(by='score', ascending=False)
+
+#     # Step 10: Convert to list of dicts for template
+#     articles = recommended.to_dict(orient='records')
+
+#     return render(request, "recommend_articles.html", {"articles": articles, "interests": interests})
+
+# import os
+# import pandas as pd
+# from django.conf import settings
+# from django.shortcuts import render
+# from sklearn.feature_extraction.text import TfidfVectorizer
+# from sklearn.metrics.pairwise import cosine_similarity
+# from .models import Client
+
+# def recommend_articles(request):
+#     # Step 1: Get the client's interests
+#     client = Client.objects.get(user=request.user)
+#     interests = client.interest.split(",") if client.interest else []
+    
+#     # Step 2: Load the dataset
+#     file_path = os.path.join(settings.BASE_DIR, "articles.csv")
+#     df = pd.read_csv(file_path)
+
+    
+
+#     if not interests or df.empty:
+#         articles = []
+#     else:
+#         # Step 3: Combine title and description for better context
+#         df['content'] = df['title'] + " " + df['description']
+
+#         # Step 4: Vectorize the article contents using TF-IDF
+#         vectorizer = TfidfVectorizer(stop_words='english')
+#         tfidf_matrix = vectorizer.fit_transform(df['content'])
+
+#         # Step 5: Convert interests into one string and vectorize it
+#         interest_text = " ".join(interests)
+#         interest_vec = vectorizer.transform([interest_text])
+
+#         # Step 6: Compute cosine similarity between interests and articles
+#         similarities = cosine_similarity(interest_vec, tfidf_matrix).flatten()
+
+#         # Step 7: Add similarity score to the DataFrame
+#         df['score'] = similarities
+
+#         # Step 8: Sort articles by similarity score in descending order
+#         recommended = df.sort_values(by='score', ascending=False)
+
+#         # Optional: Show only top 5 or relevant articles with a minimum threshold
+#         recommended = recommended[recommended['score'] > 0].head(5)
+
+#         # Step 9: Convert to dictionary format for the template
+#         articles = recommended.to_dict(orient='records')
+
+#     return render(request, "recommend_articles.html", {"articles": articles, "interests": interests})
+
 import os
 import pandas as pd
-from django.conf import settings
 from django.shortcuts import render
+from django.conf import settings
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from .models import Client
 
 def recommend_articles(request):
-    # Step 1: Get the client's interests
+    # Get user interests
     client = Client.objects.get(user=request.user)
     interests = client.interest.split(",") if client.interest else []
-    
-    # Step 2: Load the dataset
+    interests = [i.strip() for i in interests]
+
+    # Load dataset
     file_path = os.path.join(settings.BASE_DIR, "articles.csv")
     df = pd.read_csv(file_path)
 
-    # Step 3: Combine title and description for better analysis
+    # Combine title and description
     df['content'] = df['title'] + " " + df['description']
+    documents = df['content'].tolist()
+    user_input = " ".join(interests)
+    documents.append(user_input)
 
-    # Step 4: Use TF-IDF to vectorize the content
+    # Vectorize
     vectorizer = TfidfVectorizer(stop_words='english')
-    tfidf_matrix = vectorizer.fit_transform(df['content'])
+    tfidf_matrix = vectorizer.fit_transform(documents)
 
-    # Step 5: Convert interests into one string
-    interest_text = " ".join(interests)
+    # Compute similarity
+    cosine_sim = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1]).flatten()
+    df['similarity'] = cosine_sim
 
-    # Step 6: Vectorize the interest
-    interest_vec = vectorizer.transform([interest_text])
-
-    # Step 7: Compute similarity scores
-    similarities = cosine_similarity(interest_vec, tfidf_matrix).flatten()
-
-    # Step 8: Add the similarity score to the dataframe
-    df['score'] = similarities
-
-    # Step 9: Sort articles by similarity score
-    recommended = df.sort_values(by='score', ascending=False)
-
-    # Step 10: Convert to list of dicts for template
+    # Get top 5 recommendations
+    recommended = df.sort_values(by='similarity', ascending=False).head(5)
     articles = recommended.to_dict(orient='records')
 
-    return render(request, "recommend_articles.html", {"articles": articles, "interests": interests})
+    context = {
+        'articles': articles,
+        'interests': ", ".join(interests)
+    }
+
+    return render(request, 'recommend_articles.html', context)
 
 
 from .forms import ClientProfileForm, CounsellorProfileForm
