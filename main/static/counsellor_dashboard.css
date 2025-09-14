@@ -58,3 +58,16 @@ body {
   text-decoration: none;
   font-weight: 500;
   } 
+.profile-box {
+  background: white;
+  padding: 1rem;
+  border-left: 5px solid #0e7390;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-top: 0.5rem;
+  border-radius: 5px;
+}
+.profile-section h2 {
+  color: #0e7390;
+
+
+}

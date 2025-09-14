@@ -133,7 +133,9 @@ def register_counselor(request):
             Counsellor.objects.create(
                 user=user,
                 age=counselor_form.cleaned_data.get('age'),
-                experience=counselor_form.cleaned_data.get('experience')
+                experience=counselor_form.cleaned_data.get('experience'),
+                specialization =counselor_form.cleaned_data.get('specialization'),
+                description =counselor_form.cleaned_data.get('description', '').strip()
             )
 
             messages.success(request, 'Registration successful! Welcome, counsellor!')
@@ -282,10 +284,26 @@ def client_dashboard(request):
 #         model = Booking
 #         fields = ['approved_date', 'approved_time', 'status']
 
-@login_required
+# @login_required
+# def counsellor_dashboard(request):
+#     if request.user.is_counsellor:
+#         bookings = Booking.objects.filter(counsellor=request.user)
+#     else:
+#         bookings = [] 
+#     # bookings = Booking.objects.all()
+#     return render(request, 'dashboards/counsellor_dashboard.html', {'bookings': bookings})
+
+from .models import Booking, Counsellor
+
 def counsellor_dashboard(request):
-    bookings = Booking.objects.all()
+    if request.user.is_counsellor:
+        counsellor_profile = Counsellor.objects.get(user=request.user)
+        bookings = Booking.objects.filter(counsellor=counsellor_profile)
+    else:
+        bookings = []
+
     return render(request, 'dashboards/counsellor_dashboard.html', {'bookings': bookings})
+
 
 # @login_required
 # def approve_booking(request, booking_id):

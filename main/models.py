@@ -67,11 +67,30 @@ class Client(models.Model):
     def __str__(self):
         return self.user.username
 class Counsellor(models.Model):
+    SPECIALIZATION_CHOICES = [
+        ('stress_management', 'Stress Management'),
+        ('career_guidance', 'Career Guidance'),
+        ('mental_health', 'Mental Health Support'),
+        ('marriage_relationship', 'Marriage and Relationship'),
+        ('addiction', 'Addiction Counselling'),
+        ('grief_loss', 'Grief and Loss'),
+        ('self_esteem', 'Self-Esteem and Personal Growth'),
+        ('family_therapy', 'Family Therapy'),
+        ('trauma_ptsd', 'Trauma and PTSD'),
+        ('eating_disorders', 'Eating Disorders Support'),
+        ('child_adolescent', 'Child and Adolescent'),
+        ('anger_management', 'Anger Management'),
+        ('mindfulness', 'Mindfulness and Meditation'),
+        ('financial_stress', 'Financial Stress'),
+        ('lgbtq', 'LGBTQ+ Affirmative Therapy'),
+    ]
     # user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="counsellor")
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
 
     age = models.IntegerField(null=True, blank=True)
     experience = models.IntegerField(null=True, blank=True)
+    specialization = models.CharField(max_length=255, choices=SPECIALIZATION_CHOICES, blank=True)
+    description = models.TextField(blank=True, null=True)
     def __str__(self):
         return f"Counsellor: {self.user.username}"
 from .models import Client, Counsellor
