@@ -38,9 +38,12 @@ body {
 }
 
 .navbar-links li a {
-  color: #ecf0f1;
+  color: white;
   text-decoration: none;
   font-weight: 500;
+}
+.navbar-links li a:hover {
+  color: red;
 }
 
 .container {

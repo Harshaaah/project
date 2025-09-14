@@ -456,48 +456,74 @@ def logout_view(request):
 
 #     return render(request, "recommend_articles.html", {"articles": articles, "interests": interests})
 
+
+# import os
+# import pandas as pd
+# from django.shortcuts import render
+# from django.conf import settings
+# from sklearn.feature_extraction.text import TfidfVectorizer
+# from sklearn.metrics.pairwise import cosine_similarity
+# from .models import Client
+
+# def recommend_articles(request):
+#     # Get user interests
+#     client = Client.objects.get(user=request.user)
+#     interests = client.interest.split(",") if client.interest else []
+#     interests = [i.strip() for i in interests]
+
+#     # Load dataset
+#     file_path = os.path.join(settings.BASE_DIR, "articles.csv")
+#     df = pd.read_csv(file_path)
+
+#     # Combine title and description
+#     df['content'] = df['title'] + " " + df['description']
+#     documents = df['content'].tolist()
+#     user_input = " ".join(interests)
+#     documents.append(user_input)
+
+#     # Vectorize
+#     vectorizer = TfidfVectorizer(stop_words='english')
+#     tfidf_matrix = vectorizer.fit_transform(documents)
+
+#     # Compute similarity
+#     cosine_sim = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1]).flatten()
+#     df['similarity'] = cosine_sim
+
+#     # Get top 5 recommendations
+#     recommended = df.sort_values(by='similarity', ascending=False).head(5)
+#     articles = recommended.to_dict(orient='records')
+
+#     context = {
+#         'articles': articles,
+#         'interests': ", ".join(interests)
+#     }
+
+#     return render(request, 'recommend_articles.html', context)
+
+# views.py
 import os
 import pandas as pd
 from django.shortcuts import render
 from django.conf import settings
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 from .models import Client
 
 def recommend_articles(request):
-    # Get user interests
+    # Step 1: Get the logged-in client's interests
     client = Client.objects.get(user=request.user)
     interests = client.interest.split(",") if client.interest else []
-    interests = [i.strip() for i in interests]
+    interests = [i.strip().lower() for i in interests]  # Clean up spaces and case
 
-    # Load dataset
-    file_path = os.path.join(settings.BASE_DIR, "articles.csv")
+    # Step 2: Load the dataset from CSV
+    file_path = os.path.join(settings.BASE_DIR, 'articles.csv')
     df = pd.read_csv(file_path)
 
-    # Combine title and description
-    df['content'] = df['title'] + " " + df['description']
-    documents = df['content'].tolist()
-    user_input = " ".join(interests)
-    documents.append(user_input)
+    # Step 3: Filter articles by matching categories with interests
+    df['category'] = df['category'].str.lower()  # Convert categories to lowercase
+    recommended = df[df['category'].isin(interests)]
 
-    # Vectorize
-    vectorizer = TfidfVectorizer(stop_words='english')
-    tfidf_matrix = vectorizer.fit_transform(documents)
-
-    # Compute similarity
-    cosine_sim = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1]).flatten()
-    df['similarity'] = cosine_sim
-
-    # Get top 5 recommendations
-    recommended = df.sort_values(by='similarity', ascending=False).head(5)
-    articles = recommended.to_dict(orient='records')
-
-    context = {
-        'articles': articles,
-        'interests': ", ".join(interests)
-    }
-
-    return render(request, 'recommend_articles.html', context)
+    # Step 4: Pass the recommended articles to the template
+    articles = recommended.to_dict('records')  # Convert to list of dictionaries
+    return render(request, 'recommend_articles.html', {'articles': articles})
 
 
 from .forms import ClientProfileForm, CounsellorProfileForm

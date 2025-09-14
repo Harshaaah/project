@@ -23,6 +23,7 @@
 {% else %}
   <p>No recommendations found. Add some interests!</p>
 {% endif %} {% endcomment %}
+
 <h2>Recommended Articles</h2>
 <p>Based on your interests: {{ interests|join:", " }}</p>
 
@@ -31,7 +32,9 @@
     <li>
       <h3>{{ article.title }}</h3>
       <p><b>Category:</b> {{ article.category }}</p>
-      <p>{{ article.description }}</p>
+      <section class="profile-box">
+      <p>{{ article.description|linebreaksbr }}</p>
+      </section>
     </li>
   {% empty %}
     <li>No articles found matching your interests.</li>
