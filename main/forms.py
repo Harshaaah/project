@@ -50,11 +50,12 @@ class CounsellorRegisterForm(UserCreationForm):
     age = forms.IntegerField(required=False)
     experience = forms.IntegerField(required=False)
     specialization = forms.CharField(required=False, max_length=255)
+    qualification = forms.CharField(max_length=255, required=False)
     description = forms.CharField(required=False, widget=forms.Textarea)
 
     class Meta:
         model = User   # also use custom User
-        fields = ['username', 'email', 'password1', 'password2','age', 'experience', 'specialization', 'description']
+        fields = ['username', 'email', 'password1', 'password2','age', 'experience', 'specialization','qualification', 'description']
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -66,6 +67,7 @@ class CounsellorRegisterForm(UserCreationForm):
                 age=self.cleaned_data['age'],
                 experience=self.cleaned_data['experience'],
                 specialization=self.cleaned_data.get('specialization'),
+                qualification=self.cleaned_data.get('qualification'),
                 description=self.cleaned_data.get('description')
             )
         return user

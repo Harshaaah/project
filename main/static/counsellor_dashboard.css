@@ -71,3 +71,10 @@ body {
 
 
 }
+.description {
+    text-align: justify;      /* Justifies the text */
+    line-height: 1.6;        /* Adds space between lines (1.6 times the font size) */
+    margin-top: 20px;        /* Adds space above the paragraph */
+    margin-bottom: 20px;     /* Adds space below the paragraph */
+}
+

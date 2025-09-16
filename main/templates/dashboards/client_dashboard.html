@@ -110,7 +110,7 @@
   </a>
     </section>
 
-    <h2>👨‍⚕️ Available Counsellors</h2>
+    {% comment %} <h2>👨‍⚕️ Available Counsellors</h2>
     <section class="profile-box">
       
       <ul>
@@ -120,7 +120,23 @@
           <li>No counsellors available</li>
         {% endfor %}
       </ul>
-    </section>
+    </section> {% endcomment %}
+<h2>👨‍⚕️ Available Counsellors</h2>
+<div class="profile-container">
+    {% for counsellor in counsellors %}
+    <div class="profile-box-counsellor">
+        <div class="name">{{ counsellor.user.username }}</div>
+        <div class="age"><b>Age:</b> {{ counsellor.age }} years</div>
+        <div class="experience"><b>Experience: </b>{{ counsellor.experience|default:"Not specified" }} years</div>
+        <div class="specialization"><b>Specilization:</b>{{ counsellor.specialization|default:"No specialization available." }}</div>
+        <div class="qualification"><b>Qualification:</b> {{ counsellor.qualification|default:"Not specified" }}</div>
+        <div class="description"><b>Description:</b>{{ counsellor.description|default:"No description available." }}</div>
+        
+    </div>
+    {% empty %}
+    <div>No counsellors available</div>
+    {% endfor %}
+</div>
 
   </div>
 </body>
