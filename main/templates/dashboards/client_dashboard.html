@@ -69,25 +69,35 @@
     <h2>📅 Your Bookings</h2>
     <section class="profile-box">
       
-      {% comment %} <ul>
-        {% for booking in bookings %}
-          <li>{{ booking.counsellor.username }} on {{ booking.date }}</li>
-          <strong style="color: 
-          {% if booking.status == 'Accepted' %}green
-          {% elif booking.status == 'Rejected' %}red
-          {% else %}orange
-          {% endif %}
-          ">( {{ booking.status }} )</strong>
-          </li>
-  
-        {% empty %}
-          <li>No bookings yet</li>
-        {% endfor %}
-      </ul>
-      <a class="btn" href="{% url 'book_counsellor' %}">Book Counsellor</a> {% endcomment %}
+      
       {% if bookings %}
         <ul>
-          {% for booking in bookings %}
+          
+           {% comment %} {% for booking in bookings %}
+            {% if booking.status == "pending" %}
+                <!-- Show Pending bookings -->
+                <li>
+                    Counsellor: {{ booking.counsellor.user.username }} <br>
+                    ( <span style="color:orange;">Pending</span> )
+                    <form method="POST" action="{% url 'cancel_booking' booking.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn" style="background-color: #d81111ff;">Cancel</button>
+                    </form>
+                </li>
+                <hr>
+            {% elif booking.status == "Approved" %}
+                {% if booking.approved_date >= now.date %}
+                    <!-- Show Approved future bookings -->
+                    <li>
+                        Counsellor: {{ booking.counsellor.user.username }} <br>
+                        On {{ booking.approved_date }} at {{ booking.approved_time }}
+                        ( <span style="color:green;">Approved</span> )
+                    </li>
+                    <hr>
+                {% endif %}
+            {% endif %}
+        {% endfor %} {% endcomment %}
+        {% for booking in bookings %}
           <li>
             Counsellor: {{ booking.counsellor.user.username }} <br>
 
@@ -96,14 +106,38 @@
               ( <span style="color:green;">Approved</span> )
             {% else %}
               ( <span style="color:orange;">Pending</span> )
+              <form method="POST" action="{% url 'cancel_booking' booking.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn" style="background-color:  #d81111ff;">Cancel</button>
+            </form>
             {% endif %}
+
+            
+
         </li>
         <hr>
-        {% endfor %}
-    </ul>
-  {% else %}
-    <p>No bookings yet.</p>
-  {% endif %}
+          {% endfor %} 
+        </ul>
+      {% else %}
+        <p>No bookings yet.</p>
+      {% endif %}
+ {% comment %} <h2>📖 Booking History</h2>
+  <section class="profile-box">
+    {% if past_bookings %}
+        <ul>
+            {% for booking in past_bookings %}
+                <li>
+                    Counsellor: {{ booking.counsellor.user.username }} <br>
+                    On {{ booking.approved_date }} at {{ booking.approved_time }}
+                    ( <span style="color:gray;">Completed</span> )
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No past bookings.</p>
+    {% endif %}
+</section> {% endcomment %}
+
 
   <a href="{% url 'book_counsellor' %}">
     <button class="btn">Book Counsellor</button>

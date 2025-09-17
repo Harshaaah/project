@@ -273,7 +273,8 @@ def client_dashboard(request):
         'articles': articles,
         'bookings': bookings,
         'counsellors': counsellors,
-        'message': message
+        'message': message,
+        
     })
 
 # views.py
@@ -610,3 +611,10 @@ def counsellor_profile(request):
         })
 
     return render(request, 'profiles/counsellor_profile.html', {'form': form})
+
+def cancel_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    if request.method == "POST":
+        booking.delete()
+        messages.success(request, "Booking canceled successfully!")
+    return redirect('client_dashboard')  # replace with your dashboard url name
