@@ -23,7 +23,8 @@
   <div class="wrapper">
     <div class="title"><span>Login Form</span></div>
     <form method="post">
-      {%csrf_token %}
+      {% csrf_token %}
+
       <div class="row">
         <i class="fas fa-user"></i>
         <input type="text" placeholder="username" name="username" required />

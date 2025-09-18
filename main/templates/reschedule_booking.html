@@ -1,0 +1,23 @@
+{% load static %}
+<html>
+<head>
+    <title>Reschedule Booking</title>
+    <link rel="stylesheet" href="{% static 'style_approve.css' %}">
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Reschedule Booking</h2>
+    <form method="post">
+      {% csrf_token %}
+      <label for="date">New Date:</label>
+      <input type="date" id="date" name="date" value="{{ booking.approved_date|date:'Y-m-d' }}">
+
+      <label for="time">New Time:</label>
+      <input type="time" id="time" name="time" value="{{ booking.approved_time|time:'H:i' }}">
+
+      <button type="submit">Reschedule</button>
+    </form>
+  </div>
+</body>
+</html>

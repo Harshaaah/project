@@ -10,6 +10,7 @@ urlpatterns = [
     path('client_dashboard/',views.client_dashboard, name='client_dashboard'),
     path('counsellor_dashboard/',views.counsellor_dashboard, name='counsellor_dashboard'),
     path('approve_booking/<int:booking_id>/',views.approve_booking, name='approve_booking'),
+    path('reschedule_booking/<int:booking_id>/', views.reschedule_booking, name='reschedule_booking'),
     path('logout/',views.logout_view, name='logout'),
     path('articles/',views.recommend_articles, name='recommend_articles'),
     path("client/profile/", views.client_profile, name="client_profile"),

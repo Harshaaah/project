@@ -12,6 +12,21 @@
     <ul class="navbar-links">
       <li><a href="{% url 'home' %}">Home</a></li>
       <li><a href="{% url 'client_profile' %}">Profile</a></li>
+      <li class="notifications">
+        <a href="#" onclick="toggleNotifications()">Notifications ({{ notifications|length }})</a>
+        <div id="notification-dropdown" class="notification-dropdown">
+          {% if notifications %}
+            {% for notification in notifications %}
+              <div class="notification-item">
+                <p>{{ notification.message }}</p>
+                <small>{{ notification.created_at|date:"M d, Y H:i" }}</small>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p>No new notifications.</p>
+          {% endif %}
+        </div>
+      </li>
       <li><a href="{% url 'logout' %}">Logout</a></li>
     </ul>
   </nav>
@@ -116,13 +131,13 @@
 
         </li>
         <hr>
-          {% endfor %} 
+          {% endfor %}
         </ul>
       {% else %}
         <p>No bookings yet.</p>
       {% endif %}
- {% comment %} <h2>📖 Booking History</h2>
-  <section class="profile-box">
+<h2>📖 Booking History</h2>
+<section class="profile-box">
     {% if past_bookings %}
         <ul>
             {% for booking in past_bookings %}
@@ -136,7 +151,7 @@
     {% else %}
         <p>No past bookings.</p>
     {% endif %}
-</section> {% endcomment %}
+</section>
 
 
   <a href="{% url 'book_counsellor' %}">
@@ -173,5 +188,21 @@
 </div>
 
   </div>
+
+  <script>
+    function toggleNotifications() {
+      const dropdown = document.getElementById('notification-dropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('notification-dropdown');
+      const notificationsLink = event.target.closest('.notifications');
+      if (!notificationsLink && dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+      }
+    });
+  </script>
 </body>
 </html>

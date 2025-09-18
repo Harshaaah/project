@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from .forms import ClientRegisterForm
 from .forms import CounsellorRegisterForm
-from .models import Client, Counsellor,Booking
+from .models import Client, Counsellor,Booking, Notification
 def home(request):
     return render(request, 'home.html')
 
@@ -261,20 +262,48 @@ def client_dashboard(request):
         if interest:
             articles.append(f"AI article about {interest}")
 
-    # Get all bookings for this client
-    bookings = Booking.objects.filter(client=client)
+    # from django.db.models import Q
+    # from datetime import datetime, time
+
+    # now = timezone.now()
+    # today = now.date()
+    # current_time = now.time()
+
+    # Get current bookings for this client (pending or future approved)
+    bookings = Booking.objects.filter(
+        client=client)
+    # .filter(
+    #     Q(status="pending") |
+    #     Q(status="approved", approved_date__gt=today) |
+    #     Q(status="approved", approved_date=today, approved_time__gte=current_time)
+    # )
+
+    # # Get past bookings (approved and ended date/time)
+    # Get past bookings (approved and date < today)
+    past_bookings = Booking.objects.filter(client=client, status="approved", approved_date__lt=timezone.now().date())
+    # past_bookings = Booking.objects.filter(
+    #     client=client,
+    #     status="approved"
+    # ).filter(
+    #     Q(approved_date__lt=today) |
+    #     Q(approved_date=today, approved_time__lt=current_time)
+    # )
 
     # Get all counsellors
     counsellors = Counsellor.objects.all()
+
+    # Get unread notifications for the client
+    notifications = Notification.objects.filter(client=client, is_read=False).order_by('-created_at')
 
     return render(request, 'dashboards/client_dashboard.html', {
         'client': client,
         'interests': interests,
         'articles': articles,
         'bookings': bookings,
+        'past_bookings': past_bookings,
         'counsellors': counsellors,
         'message': message,
-        
+        'notifications': notifications,
     })
 
 # views.py
@@ -303,7 +332,9 @@ def counsellor_dashboard(request):
     else:
         bookings = []
 
-    return render(request, 'dashboards/counsellor_dashboard.html', {'bookings': bookings})
+    current_date = timezone.now().date()
+
+    return render(request, 'dashboards/counsellor_dashboard.html', {'bookings': bookings, 'current_date': current_date})
 
 
 # @login_required
@@ -338,11 +369,39 @@ def approve_booking(request, booking_id):
         booking.status = "Approved"
         booking.save()
 
+        # Create notification for client
+        message = f"Your booking with Counsellor {booking.counsellor.user.username} has been approved for {approved_date} at {approved_time}."
+        Notification.objects.create(client=booking.client, message=message)
+
         # redirect to dashboard
         return redirect('counsellor_dashboard')
 
     # if GET → just show the form
     return render(request, 'approve_booking.html', {"booking": booking})
+
+@login_required
+def reschedule_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, counsellor=request.user.counsellor)
+
+    if request.method == "POST":
+        # get new date & time from form
+        approved_date = request.POST.get('date')
+        approved_time = request.POST.get('time')
+
+        # update booking
+        booking.approved_date = approved_date
+        booking.approved_time = approved_time
+        booking.save()
+
+        # Create notification for client
+        message = f"Your booking with Counsellor {booking.counsellor.user.username} has been rescheduled to {approved_date} at {approved_time}."
+        Notification.objects.create(client=booking.client, message=message)
+
+        # redirect to dashboard
+        return redirect('counsellor_dashboard')
+
+    # if GET → just show the form
+    return render(request, 'reschedule_booking.html', {"booking": booking})
 
 
 # @login_required

@@ -29,7 +29,9 @@
     <tr>
       <th>Client</th>
       <th>Status</th>
+      <th>Completion Status</th>
       <th>Action</th>
+      <th>Reschedule</th>
     </tr>
     {% for b in bookings %}
     <tr>
@@ -37,19 +39,23 @@
       <td>{{ b.client.user.username }}</td>  
 
       <td>
-        {% comment %} {% if b.status == "pending" %}
-          <span style="color: orange;">Pending</span>
-        {% elif b.status == "approved" %}
-          ✅ Scheduled for {{ b.approved_date }} at {{ b.approved_time }}
-        {% endif %} {% endcomment %}
-            
         {% if b.get_status_display == "Pending" %}
           <span style="color: orange;">Pending</span>
         {% elif b.get_status_display == "Approved" %}
           ✅ Scheduled for {{ b.approved_date }} at {{ b.approved_time }}
         {% endif %}
+      </td>
 
-
+      <td>
+        {% if b.status == "Approved" %}
+          {% if b.approved_date < current_date %}
+            <span style="color: gray;">Completed</span>
+          {% else %}
+            <span style="color: green;">Not Completed</span>
+          {% endif %}
+        {% else %}
+          N/A
+        {% endif %}
       </td>
 
       <td>
@@ -59,10 +65,18 @@
           Approved
         {% endif %}
       </td>
+
+      <td>
+        {% if b.status == "Approved" and b.approved_date >= current_date %}
+          <a href="{% url 'reschedule_booking' b.id %}">Reschedule</a>
+        {% else %}
+          N/A
+        {% endif %}
+      </td>
     </tr>
     {% empty %}
     <tr>
-      <td colspan="3">No bookings yet.</td>
+      <td colspan="5">No bookings yet.</td>
     </tr>
     {% endfor %}
   </table>
