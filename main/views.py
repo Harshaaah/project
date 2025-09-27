@@ -48,7 +48,9 @@ def login_view(request):
             messages.error(request, "Invalid username or password")
             
             return redirect("login")
-    return render(request, 'login.html')
+    return render(request, 'login.html', {})
+
+
 
     #     if user is not None:
     #         login(request, user)
@@ -214,7 +216,7 @@ def book_counsellor(request):
             booking = form.save(commit=False)
             booking.client = request.user.client   # set client
             booking.counsellor = form.cleaned_data['counsellor']  # set counsellor
-            booking.status = "pending"  # set default status
+            booking.status = "Pending"  # set default status
             booking.save()
             return redirect('client_dashboard')
     else:
@@ -231,6 +233,8 @@ def book_counsellor(request):
 #     else:
 #         return ["How to Stay Positive Daily", "Benefits of Talking to a Therapist"]
 
+from django.db.models import Q
+
 @login_required
 def client_dashboard(request):    
     client = request.user.client  # get the logged-in client user
@@ -243,9 +247,12 @@ def client_dashboard(request):
             # If client has existing interests
             if client.interest:
                 # Add new interest to existing list
-                client.interest += f", {new_interest}"
+                interests_list = client.interest.split(",")
+                interests_list = [i.strip() for i in interests_list if i.strip()]
+                interests_list.append(new_interest.strip())
+                client.interest = ", ".join(interests_list)
             else:
-                client.interest = new_interest  # First interest
+                client.interest = new_interest.strip()  # First interest
             client.save()  # Save updated client
             message = "Interest added successfully!"
 
@@ -260,7 +267,7 @@ def client_dashboard(request):
     for interest in interests:
         interest = interest.strip()
         if interest:
-            articles.append(f"AI article about {interest}")
+            articles.append(f"Article about {interest}")
 
     # from django.db.models import Q
     # from datetime import datetime, time
@@ -270,17 +277,18 @@ def client_dashboard(request):
     # current_time = now.time()
 
     # Get current bookings for this client (pending or future approved)
-    bookings = Booking.objects.filter(
-        client=client)
-    # .filter(
-    #     Q(status="pending") |
-    #     Q(status="approved", approved_date__gt=today) |
-    #     Q(status="approved", approved_date=today, approved_time__gte=current_time)
-    # )
+    bookings = Booking.objects.filter(client=client).filter(
+        Q(status="Pending") |
+        Q(status="Approved", approved_date__gt=timezone.now().date()) |
+        Q(status="Approved", approved_date=timezone.now().date(), approved_time__gte=timezone.now().time())
+    )
 
-    # # Get past bookings (approved and ended date/time)
-    # Get past bookings (approved and date < today)
-    past_bookings = Booking.objects.filter(client=client, status="approved", approved_date__lt=timezone.now().date())
+    # Get past bookings (completed sessions)
+    # past_bookings = Booking.objects.filter(
+    #     client=client,
+    #     status="completed"
+    # )
+    past_bookings = Booking.objects.filter(client=request.user.client, status__in=["Completed", "Approved"])
     # past_bookings = Booking.objects.filter(
     #     client=client,
     #     status="approved"
@@ -327,8 +335,9 @@ from .models import Booking, Counsellor
 
 def counsellor_dashboard(request):
     if request.user.is_counsellor:
-        counsellor_profile = Counsellor.objects.get(user=request.user)
-        bookings = Booking.objects.filter(counsellor=counsellor_profile)
+        # counsellor_profile = Counsellor.objects.get(user=request.user)
+        # bookings = Booking.objects.filter(counsellor=counsellor_profile)
+        bookings = Booking.objects.filter(counsellor=request.user.counsellor)
     else:
         bookings = []
 
@@ -671,9 +680,71 @@ def counsellor_profile(request):
 
     return render(request, 'profiles/counsellor_profile.html', {'form': form})
 
+# def cancel_booking(request, booking_id):
+#     booking = get_object_or_404(Booking, id=booking_id)
+#     if request.method == "POST":
+#         booking.delete()
+#         messages.success(request, "Booking canceled successfully!")
+#     return redirect('client_dashboard')  # replace with your dashboard url name
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+
+@login_required
 def cancel_booking(request, booking_id):
-    booking = get_object_or_404(Booking, id=booking_id)
+    booking = get_object_or_404(Booking, id=booking_id, client=request.user.client)  
+    # ensures only the owner can cancel
+
     if request.method == "POST":
         booking.delete()
         messages.success(request, "Booking canceled successfully!")
-    return redirect('client_dashboard')  # replace with your dashboard url name
+
+    return redirect('client_dashboard')  # make sure this URL name exists in urls.py
+
+# -----------------------------
+# FEEDBACK VIEWS
+# -----------------------------
+@login_required
+def submit_feedback(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, client=request.user.client)
+
+    # Check if booking is completed and doesn't have feedback yet
+    if booking.status != "Completed" or booking.feedback is not None:
+        messages.error(request, "Feedback can only be submitted for completed sessions without existing feedback.")
+        return redirect('client_dashboard')
+
+    if request.method == "POST":
+        form = FeedbackForm(request.POST, instance=booking)
+        if form.is_valid():
+            feedback_instance = form.save(commit=False)
+            feedback_instance.feedback_date = timezone.now()
+            feedback_instance.save()
+
+            messages.success(request, "Thank you for your feedback!")
+            return redirect('client_dashboard')
+    else:
+        form = FeedbackForm(instance=booking)
+
+    return render(request, 'submit_feedback.html', {'form': form, 'booking': booking})
+
+
+@login_required
+def mark_session_completed(request, booking_id):
+    """Allow counsellors to mark a session as completed"""
+    booking = get_object_or_404(Booking, id=booking_id, counsellor=request.user.counsellor)
+
+    if request.method == "POST":
+        if booking.status == "Approved":
+            booking.status = "Completed"
+            booking.save()
+
+            # Create notification for client
+            message = f"Your counselling session with {booking.counsellor.user.username} has been completed. Please provide your feedback."
+            Notification.objects.create(client=booking.client, message=message)
+
+            messages.success(request, "Session marked as completed. Client will be notified to provide feedback.", extra_tags="dashboard")
+        else:
+            messages.error(request, "Only approved sessions can be marked as completed.", extra_tags="dashboard")
+
+    return redirect('counsellor_dashboard')

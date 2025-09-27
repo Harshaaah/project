@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit Feedback</title>
+    <link rel="stylesheet" href="{% static 'client_dashboard.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">Care your Mind</div>
+        <ul class="navbar-links">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'client_profile' %}">Profile</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>Submit Feedback</h1>
+
+        <div class="profile-section">
+            <h2>Session Details</h2>
+            <div class="profile-box">
+                <p><strong>Counsellor:</strong> {{ booking.counsellor.user.username }}</p>
+                <p><strong>Session Date:</strong> {{ booking.approved_date }}</p>
+                <p><strong>Session Time:</strong> {{ booking.approved_time }}</p>
+                <p><strong>Status:</strong> <span style="color: green;">{{ booking.get_status_display }}</span></p>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h2>Your Feedback</h2>
+            <div class="profile-box">
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="{{ form.rating.id_for_label }}">Rating:</label>
+                        {{ form.rating }}
+                        {% if form.rating.errors %}
+                            <div class="error">{{ form.rating.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.feedback.id_for_label }}">Your Experience:</label>
+                        {{ form.feedback }}
+                        {% if form.feedback.errors %}
+                            <div class="error">{{ form.feedback.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn">Submit Feedback</button>
+                    <a href="{% url 'client_dashboard' %}" class="btn" style="background-color: #6c757d;">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</body>
+</html>

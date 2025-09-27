@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='booking',
             name='status',
-            field=models.CharField(choices=[('pending', 'Pending'), ('approved', 'Approved')], default='pending', max_length=20),
+            field=models.CharField(choices=[('', 'Pending'), ('approved', 'Approved')], default='pending', max_length=20),
         ),
     ]

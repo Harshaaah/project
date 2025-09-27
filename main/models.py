@@ -133,13 +133,21 @@ class Booking(models.Model):
     requested_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=20,
-        choices=[("pending", "Pending"), ("approved", "Approved")],
-        default="pending"
+        choices=[("Pending", "Pending"), ("Approved", "Approved"), ("Completed", "Completed")],
+        default="Pending"
     )
-    
+
     # Counsellor fills this after approval
     approved_date = models.DateField(null=True, blank=True)
     approved_time = models.TimeField(null=True, blank=True)
+
+    # Feedback and rating fields
+    rating = models.IntegerField(
+        choices=[(1, "1 Star"), (2, "2 Stars"), (3, "3 Stars"), (4, "4 Stars"), (5, "5 Stars")],
+        null=True, blank=True
+    )
+    feedback = models.TextField(blank=True, null=True)
+    feedback_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.client.user.username} -> {self.counsellor.user.username} ({self.status})"

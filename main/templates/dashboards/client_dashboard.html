@@ -7,6 +7,16 @@
   <link rel="stylesheet" href="{% static 'client_dashboard.css' %}">
 </head>
 <body>
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+      <div class="alert alert-success">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
   <nav class="navbar">
     <div class="navbar-brand">Care your Mind</div>
     <ul class="navbar-links">
@@ -38,7 +48,10 @@
       <h2>👤 Your Profile</h2>
       <div class="profile-box">
         <p><strong>Age:</strong> {{ user.client.age }}</p>
-        <p><strong>Interest:</strong> {{ client.interest }}</p>
+        <p><strong>Interest:</strong>  
+          {% for i in interests %}
+            {{ i }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}</p>
 
         <h3> Add New Interest</h3>
         <form method="POST">
@@ -70,7 +83,7 @@
 
 
     <section class="articles-section">
-      <h2> AI Recommended Articles</h2>
+      <h2> Recommended Articles</h2>
       <section class="profile-box">
         <p>Based on your interests: {{ interests }}</p>
 
@@ -142,10 +155,31 @@
         <ul>
             {% for booking in past_bookings %}
                 <li>
-                    Counsellor: {{ booking.counsellor.user.username }} <br>
-                    On {{ booking.approved_date }} at {{ booking.approved_time }}
-                    ( <span style="color:gray;">Completed</span> )
+                    <strong>Counsellor:</strong> {{ booking.counsellor.user.username }} <br>
+                    <strong>Date:</strong> {{ booking.approved_date }} <br>
+                    <strong>Time:</strong> {{ booking.approved_time }} <br>
+                    {% comment %} <strong>Status:</strong> <span style="color:gray;">Completed</span> {% endcomment %}
+                    <strong>Status:</strong> <span style="color:{% if booking.status == 'Completed' %}gray{% else %}orange{% endif %};">{{ booking.status }}</span>
+
+                    {% if booking.feedback %}
+                        <br><strong>Rating:</strong>
+                        {% for i in "12345" %}
+                            {% if i|add:"0" <= booking.rating %}
+                                ⭐
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                        ({{ booking.get_rating_display }})
+                        <br><strong>Feedback:</strong> {{ booking.feedback|truncatechars:100 }}
+                    {% else %}
+                        <br>
+                        <a href="{% url 'submit_feedback' booking.id %}">
+                            <button class="btn" style="background-color: #28a745;">Give Feedback</button>
+                        </a>
+                    {% endif %}
                 </li>
+                <hr>
             {% endfor %}
         </ul>
     {% else %}

@@ -96,3 +96,27 @@ class CounsellorProfileForm(forms.Form):
     email = forms.EmailField()
     age = forms.IntegerField(required=False)
     experience = forms.IntegerField(required=False)
+
+
+# -----------------------------
+# FEEDBACK FORM
+# -----------------------------
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['rating', 'feedback']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['rating'].widget = forms.Select(choices=[
+            ('', 'Select Rating'),
+            (1, '1 Star - Poor'),
+            (2, '2 Stars - Fair'),
+            (3, '3 Stars - Good'),
+            (4, '4 Stars - Very Good'),
+            (5, '5 Stars - Excellent')
+        ])
+        self.fields['feedback'].widget = forms.Textarea(attrs={
+            'rows': 4,
+            'placeholder': 'Please share your experience with this counselling session...'
+        })

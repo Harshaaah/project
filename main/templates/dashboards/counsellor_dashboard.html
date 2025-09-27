@@ -3,6 +3,7 @@
 {% block content %}
 
 
+
     <link rel="stylesheet" href="{% static 'counsellor_dashboard.css' %}">
   <body style="background-color: lightblue;">
     <nav class="navbar">
@@ -41,13 +42,13 @@
       <td>
         {% if b.get_status_display == "Pending" %}
           <span style="color: orange;">Pending</span>
-        {% elif b.get_status_display == "Approved" %}
+        {% elif b.get_status_display == "Approved" and b.status == Completed %}
           ✅ Scheduled for {{ b.approved_date }} at {{ b.approved_time }}
         {% endif %}
       </td>
 
       <td>
-        {% if b.status == "Approved" %}
+        {% if b.status == "Approved" or b.status == Completed %}
           {% if b.approved_date < current_date %}
             <span style="color: gray;">Completed</span>
           {% else %}
@@ -59,7 +60,7 @@
       </td>
 
       <td>
-        {% if b.status == "pending" %}
+        {% if b.status == "Pending" %}
           <a href="{% url 'approve_booking' b.id %}">Approve</a>
         {% else %}
           Approved
@@ -69,10 +70,16 @@
       <td>
         {% if b.status == "Approved" and b.approved_date >= current_date %}
           <a href="{% url 'reschedule_booking' b.id %}">Reschedule</a>
+         {% elif b.status == "Approved" and b.approved_date < current_date %}
+          <form method="POST" action="{% url 'mark_session_completed' b.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn" style="background-color: #28a745;">Mark Completed</button>
+          </form>
         {% else %}
           N/A
         {% endif %}
       </td>
+      
     </tr>
     {% empty %}
     <tr>
@@ -80,4 +87,13 @@
     </tr>
     {% endfor %}
   </table>
+  <div style="margin-top: 20px;">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+</div>
 {% endblock %}
