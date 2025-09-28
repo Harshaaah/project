@@ -705,12 +705,13 @@ def cancel_booking(request, booking_id):
 # -----------------------------
 # FEEDBACK VIEWS
 # -----------------------------
+from .forms import FeedbackForm
 @login_required
 def submit_feedback(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id, client=request.user.client)
 
     # Check if booking is completed and doesn't have feedback yet
-    if booking.status != "Completed" or booking.feedback is not None:
+    if booking.status != "Completed" and booking.feedback is not None:
         messages.error(request, "Feedback can only be submitted for completed sessions without existing feedback.")
         return redirect('client_dashboard')
 
@@ -748,3 +749,17 @@ def mark_session_completed(request, booking_id):
             messages.error(request, "Only approved sessions can be marked as completed.", extra_tags="dashboard")
 
     return redirect('counsellor_dashboard')
+
+
+@login_required
+def view_counsellor_feedback(request, counsellor_id):
+    counsellor = get_object_or_404(Counsellor, id=counsellor_id)
+    feedbacks = Booking.objects.filter(
+        counsellor=counsellor,
+        status="Completed",
+        feedback__isnull=False
+    ).order_by('-feedback_date')
+    return render(request, 'view_counsellor_feedback.html', {
+        'counsellor': counsellor,
+        'feedbacks': feedbacks
+    })

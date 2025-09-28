@@ -42,13 +42,13 @@
       <td>
         {% if b.get_status_display == "Pending" %}
           <span style="color: orange;">Pending</span>
-        {% elif b.get_status_display == "Approved" and b.status == Completed %}
+        {% elif b.get_status_display == "Approved" or b.status == "Completed" %}
           ✅ Scheduled for {{ b.approved_date }} at {{ b.approved_time }}
         {% endif %}
       </td>
 
       <td>
-        {% if b.status == "Approved" or b.status == Completed %}
+        {% if b.status == "Approved" or b.status == "Completed" %}
           {% if b.approved_date < current_date %}
             <span style="color: gray;">Completed</span>
           {% else %}

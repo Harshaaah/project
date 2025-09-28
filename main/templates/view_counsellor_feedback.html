@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Feedback for {{ counsellor.user.username }}</title>
+    <link rel="stylesheet" href="{% static 'feedback.css' %}">
+</head>
+<body>
+    {% comment %} <nav class="navbar">
+        <div class="navbar-brand">Care your Mind</div>
+        <ul class="navbar-links">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'client_profile' %}">Profile</a></li>
+            <li><a href="{% url 'client_dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+    </nav> {% endcomment %}
+
+    <div>
+        <h1>Feedback for {{ counsellor.user.username }}</h1>
+
+        {% if feedbacks %}
+            <section class="profile-box">
+                <ul>
+                    {% for feedback in feedbacks %}
+                        <li>
+                            <strong>From Client:</strong> {{ feedback.client.user.username }} <br>
+                            <strong>Date:</strong> {{ feedback.feedback_date|date:"M d, Y H:i" }} <br>
+                            <strong>Rating:</strong>
+                            {% for i in "12345" %}
+                                {% if i|add:"0" <= feedback.rating %}
+                                    ⭐
+                                {% else %}
+                                    ☆
+                                {% endif %}
+                            {% endfor %}
+                            ({{ feedback.get_rating_display }}) <br>
+                            <strong>Feedback:</strong> {{ feedback.feedback|truncatechars:200 }}
+                        </li>
+                        <hr>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% else %}
+            <p>No feedback available for this counsellor yet.</p>
+        {% endif %}
+<br><br>
+        <center>
+            <a href="{% url 'client_dashboard' %}">
+                <button class="btn">Back to Dashboard</button>
+            </a>
+        </center>
+    </div>
+</body>
+</html>

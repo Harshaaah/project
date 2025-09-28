@@ -18,6 +18,7 @@ urlpatterns = [
     path('cancel_booking/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
     path('submit_feedback/<int:booking_id>/', views.submit_feedback, name='submit_feedback'),
     path('mark_session_completed/<int:booking_id>/', views.mark_session_completed, name='mark_session_completed'),
+    path('view-counsellor-feedback/<int:counsellor_id>/', views.view_counsellor_feedback, name='view_counsellor_feedback'),
 
 ]
 

@@ -66,7 +66,9 @@
             <option value="health">Health</option>
             <option value="finance">Finance</option>
           </select>
+          
           <div>
+            <br>
           <button class="btn" type="submit">Add Interest</button>
         </form>
 
@@ -172,7 +174,8 @@
                         {% endfor %}
                         ({{ booking.get_rating_display }})
                         <br><strong>Feedback:</strong> {{ booking.feedback|truncatechars:100 }}
-                    {% else %}
+                    {% elif booking.status == "Completed" %}
+
                         <br>
                         <a href="{% url 'submit_feedback' booking.id %}">
                             <button class="btn" style="background-color: #28a745;">Give Feedback</button>
@@ -187,10 +190,11 @@
     {% endif %}
 </section>
 
-
+<center>
   <a href="{% url 'book_counsellor' %}">
     <button class="btn">Book Counsellor</button>
   </a>
+</center>
     </section>
 
     {% comment %} <h2>👨‍⚕️ Available Counsellors</h2>
@@ -214,7 +218,11 @@
         <div class="specialization"><b>Specilization:</b>{{ counsellor.specialization|default:"No specialization available." }}</div>
         <div class="qualification"><b>Qualification:</b> {{ counsellor.qualification|default:"Not specified" }}</div>
         <div class="description"><b>Description:</b>{{ counsellor.description|default:"No description available." }}</div>
-        
+        <div class="feedback-link">
+            <a href="{% url 'view_counsellor_feedback' counsellor.id %}">
+                <button class="btn">View Feedback</button>
+            </a>
+        </div>
     </div>
     {% empty %}
     <div>No counsellors available</div>
