@@ -73,7 +73,7 @@
          {% elif b.status == "Approved" and b.approved_date < current_date %}
           <form method="POST" action="{% url 'mark_session_completed' b.id %}" style="display:inline;">
             {% csrf_token %}
-            <button type="submit" class="btn" style="background-color: #28a745;">Mark Completed</button>
+            <button type="submit" class="btn" style="background-color: #28a745;">Notify feedback</button>
           </form>
         {% else %}
           N/A
